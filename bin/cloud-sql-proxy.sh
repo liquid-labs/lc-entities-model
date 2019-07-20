@@ -7,6 +7,9 @@ set -o pipefail
 
 ACTION="${1-}"; shift || true
 
+# PORT=3306 # for mysql
+PORT=5432 # for postgres
+
 # 'cloud_sql_proxy' is essentially a wrapper that spawns a second process; but
 # killing the parent does not kill the child, so we have to fallback to process
 # grepping
@@ -25,9 +28,9 @@ isRunning() {
 startProxy() {
   local CLOUDSQL_CREDS="$HOME/.catalyst/creds/${CLOUDSQL_SERVICE_ACCT}.json"
   # We were using the following to capture the pid, but see note on 'isRunning'
-  # bash -c "cd '${BASE_DIR}'; ( npx --no-install cloud_sql_proxy -instances='${CLOUDSQL_CONNECTION_NAME}'=tcp:3306 -credential_file='${CLOUDSQL_CREDS}' & echo \$! >&3 ) 3> '${PID_FILE}' 2> '${SERV_LOG}' &"
+  # bash -c "cd '${BASE_DIR}'; ( npx --no-install cloud_sql_proxy -instances='${CLOUDSQL_CONNECTION_NAME}'=tcp:$PORT -credential_file='${CLOUDSQL_CREDS}' & echo \$! >&3 ) 3> '${PID_FILE}' 2> '${SERV_LOG}' &"
   # Annoyingly, cloud_sql_proxy (at time of note) emits all logs to stderr.
-  bash -c "cd '${BASE_DIR}'; npx --no-install cloud_sql_proxy -instances='${CLOUDSQL_PROXY_CONNECTION_NAME}'=tcp:3306 -credential_file='$CLOUDSQL_CREDS' 2> '${SERV_LOG}' &"
+  bash -c "cd '${BASE_DIR}'; npx --no-install cloud_sql_proxy -instances='${CLOUDSQL_PROXY_CONNECTION_NAME}'=tcp:$PORT -credential_file='$CLOUDSQL_CREDS' 2> '${SERV_LOG}' &"
 }
 
 stopProxy() {
@@ -62,8 +65,10 @@ case "$ACTION" in
     TZ=`date +%z`
     TZ=`echo ${TZ: 0: 3}:${TZ: -2}`
     # TODO: libray-ize and use 'isReceivingPipe' or even 'isInPipe' (suppress if piping in or out?)
-    test -t 0 && echo "Setting time zone: $TZ"
-    mysql -h127.0.0.1 "${CLOUDSQL_DB}" --init-command 'SET time_zone="'$TZ'"';;
+    # test -t 0 && echo "Setting time zone: $TZ"
+    # mysql -h127.0.0.1 "${CLOUDSQL_DB}" --init-command 'SET time_zone="'$TZ'"'
+    psql "host=127.0.0.1 port=$PORT sslmode=disable dbname='$CLOUDSQL_DB' user='$CLOUDSQL_USER' password='$CLOUDSQL_PASSWORD'"
+    ;;
   dump-check)
     exit 0;;
   dump)
@@ -79,7 +84,7 @@ case "$ACTION" in
       dev|test)
         case "$PARAM_NAME" in
           CLOUDSQL_CONNECTION_NAME)
-            echo '127.0.0.1:3306';;
+            echo '127.0.0.1:$PORT';;
           CLOUDSQL_CONNECTION_PROT)
             echo 'tcp';;
           *)

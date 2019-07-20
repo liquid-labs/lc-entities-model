@@ -34,6 +34,7 @@
         ],
         "purposes": [
           "dev",
+          "test",
           "pre-production",
           "production"
         ],
@@ -48,13 +49,15 @@
           "CLOUDSQL_CONNECTION_NAME",
           "CLOUDSQL_PROXY_CONNECTION_NAME",
           "CLOUDSQL_SERVICE_ACCT",
-          "CLOUDSQL_DB",
-          "FIREBASE_CREDS_FILE"
+          "CLOUDSQL_USER",
+          "CLOUDSQL_PASSWORD",
+          "CLOUDSQL_DB"
         ],
         "params-opt": [],
         "config-const": {}
       }
-    ]
+    ],
+    "requires" : []
   },
   "dependencies": {
     "@liquid-labs/cloud-sql-proxy": "^1.0.0-alpha.0"
