@@ -66,6 +66,7 @@ func (e *Entity) GetLastUpdated() time.Time { return e.LastUpdated }
 
 // EntityIface is provided for extension by abstract entity types. In most
 // situations you will use the Entity struct directly.
+// TODO: confirm no longer necessary.
 /*type EntityIface interface {
   GetID() int64
 
