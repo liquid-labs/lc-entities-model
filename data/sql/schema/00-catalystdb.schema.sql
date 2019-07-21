@@ -1,12 +1,28 @@
 CREATE TABLE catalystdb (
-  `update` INT(11),
-  `schema_hash` CHAR(64),
-  `version_spec` TEXT,
-  CONSTRAINT `catalystdb_key` PRIMARY KEY ( `update`,`schema_hash` )
+  last_update TIMESTAMPTZ,
+  schema_hash CHAR(64),
+  version_spec TEXT,
+  CONSTRAINT catalystdb_key PRIMARY KEY ( last_update,schema_hash )
 );
 
-DELIMITER //
-CREATE TRIGGER `catalystdb_updateed`
-  BEFORE INSERT ON catalystdb FOR EACH ROW
-    SET new.update=UNIX_TIMESTAMP();//
-DELIMITER ;
+-- Postgres
+CREATE OR REPLACE FUNCTION trigger_catalyst_db_updated()
+  RETURNS TRIGGER AS '
+BEGIN
+  NEW.last_update := NOW();
+  RETURN NEW;
+END' LANGUAGE 'plpgsql';
+
+DROP EVENT TRIGGER IF EXISTS catalystdb_updated;
+
+CREATE TRIGGER catalystdb_updated
+  BEFORE INSERT ON catalystdb
+  FOR EACH ROW
+  EXECUTE PROCEDURE trigger_catalyst_db_updated();
+
+-- MySQL
+-- DELIMITER //
+-- CREATE TRIGGER `catalystdb_updated`
+--  BEFORE INSERT ON catalystdb FOR EACH ROW
+--    SET new.last_update=UNIX_TIMESTAMP();//
+-- DELIMITER ;
