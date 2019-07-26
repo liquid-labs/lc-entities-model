@@ -9,7 +9,13 @@
     "go-dev-server.sh": "./bin/go-dev-server.sh"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "rm -rf ./dist/* && mkdir -p ./dist",
+    "build": "catalyst-scripts build",
+    "pretest": "catalyst-scripts pretest",
+    "test": "catalyst-scripts test",
+    "lint": "catalyst-scripts lint",
+    "lint-fix": "catalyst-scripts lint-fix",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -57,9 +63,12 @@
         "config-const": {}
       }
     ],
-    "requires" : []
+    "requires": []
   },
   "dependencies": {
     "@liquid-labs/cloud-sql-proxy": "^1.0.0-alpha.0"
+  },
+  "devDependencies": {
+    "@liquid-labs/catalyst-scripts": "^1.0.0-alpha.22"
   }
 }
