@@ -2,6 +2,7 @@ package coremodel
 
 type Container struct {
   Entity
+  Contents []*Entity
 }
 
 func NewContainer(
@@ -9,13 +10,13 @@ func NewContainer(
     description string,
     ownerPubID PublicID,
     publiclyReadable bool) *Container {
-  return &Container{*NewEntity(name, description, ownerPubID, publiclyReadable)}
+  return &Container{*NewEntity(name, description, ownerPubID, publiclyReadable), []*Entity{}}
 }
 
 func (c *Container) Clone() *Container {
-  return &Container{*c.Entity.Clone()}
+  return &Container{*c.Entity.Clone(), c.Contents}
 }
 
 func (c *Container) CloneNew() *Container {
-  return &Container{*c.Entity.CloneNew()}
+  return &Container{*c.Entity.CloneNew(), c.Contents}
 }

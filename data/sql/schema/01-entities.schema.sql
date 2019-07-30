@@ -55,9 +55,3 @@ CREATE TRIGGER entities_last_updated
   BEFORE INSERT OR UPDATE ON entities
   FOR EACH ROW
   EXECUTE PROCEDURE trigger_entities_last_updated();
-
-CREATE TABLE containers (
-  id  BIGINT,
-  CONSTRAINT containers_key PRIMARY KEY ( id ),
-  CONSTRAINT containers_ref_entities FOREIGN KEY ( id ) REFERENCES entities ( id )
-);

@@ -15,7 +15,6 @@ func TestEntitiesClone(t *testing.T) {
   orig.ID = 1
   orig.PubID = `abc`
   orig.OwnerID = 2
-  orig.Containers = []*Container{}
   orig.CreatedAt = now
   orig.LastUpdated = now.Add(100)
   orig.DeletedAt = now.Add(200)
@@ -30,7 +29,6 @@ func TestEntitiesClone(t *testing.T) {
   clone.OwnerID = 4
   clone.OwnerPubID = `owner-B`
   clone.PubliclyReadable = false
-  clone.Containers = []*Container{NewContainer(`folder`, `a folder`, `owner-B`, false)}
   clone.CreatedAt = orig.CreatedAt.Add(20)
   clone.LastUpdated = orig.LastUpdated.Add(20)
   clone.DeletedAt = orig.DeletedAt.Add(20)
@@ -55,7 +53,6 @@ func TestEntitiesCloneNew(t *testing.T) {
   orig.ID = 1
   orig.PubID = `abc`
   orig.OwnerID = 2
-  orig.Containers = []*Container{}
   orig.CreatedAt = now
   orig.LastUpdated = now.Add(100)
   orig.DeletedAt = now.Add(200)
@@ -74,7 +71,6 @@ func TestEntitiesCloneNew(t *testing.T) {
   clone.OwnerID = 4
   clone.OwnerPubID = `owner-B`
   clone.PubliclyReadable = false
-  clone.Containers = []*Container{NewContainer(`folder`, `a folder`, `owner-B`, false)}
   clone.CreatedAt = orig.CreatedAt.Add(20)
   clone.LastUpdated = orig.LastUpdated.Add(20)
   clone.DeletedAt = orig.DeletedAt.Add(20)

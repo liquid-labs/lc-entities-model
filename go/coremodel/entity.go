@@ -27,7 +27,6 @@ type Entity struct {
   OwnerID          InternalID  `json:"-" pg:",notnull"`
   OwnerPubID       PublicID    `json:"ownerPubId"`
   PubliclyReadable bool        `json:"publiclyReadable" pg:",notnull"`
-  Containers       []*Container `json:"containers" pg:"many2many:containers"`
   CreatedAt        time.Time   `json:createdAt`
   LastUpdated      time.Time   `json:"lastUpdated"`
   DeletedAt        time.Time   `pg:",soft_delete"`
@@ -48,7 +47,6 @@ func NewEntity(
     0,
     ownerPubID,
     publiclyReadable,
-    []*Container{},
     time.Time{},
     time.Time{},
     time.Time{},
@@ -64,7 +62,6 @@ func (e *Entity) Clone() *Entity {
     e.OwnerID,
     e.OwnerPubID,
     e.PubliclyReadable,
-    e.Containers,
     e.CreatedAt,
     e.LastUpdated,
     e.DeletedAt,
@@ -80,7 +77,6 @@ func (e *Entity) CloneNew() *Entity {
     e.OwnerID,
     e.OwnerPubID,
     e.PubliclyReadable,
-    e.Containers,
     e.CreatedAt,
     e.LastUpdated,
     e.DeletedAt,
@@ -98,8 +94,6 @@ func (e *Entity) SetOwnerPubID(pid PublicID) { e.OwnerPubID = pid }
 
 func (e *Entity) IsPubliclyReadable() bool { return e.PubliclyReadable }
 func (e *Entity) SetPubliclyReadable(r bool) { e.PubliclyReadable = r }
-
-func (e *Entity) GetContainers() []*Container { return e.Containers }
 
 func (e *Entity) GetCreatedAt() time.Time { return e.CreatedAt }
 

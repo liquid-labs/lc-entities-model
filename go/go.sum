@@ -1,3 +1,4 @@
+github.com/Liquid-Labs/catalyst-core-model v0.0.0-20190531211051-e5dfec386b64 h1:GoEofaNv2AtnBcEcOb5fvjD3FH19tUI0Wf9rkxZfi7M=
 github.com/Liquid-Labs/go-nullable-mysql v1.0.2 h1:FbUqf0Y1ec3Kwr4NOXawYC/OtS3mUjr9g7cwRQhlVVA=
 github.com/Liquid-Labs/go-nullable-mysql v1.0.2/go.mod h1:vpdFQvKE6cAnjDL+70ZYGJqjRc5YvGZ7fe7eX8AetfA=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
