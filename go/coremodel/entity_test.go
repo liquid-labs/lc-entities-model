@@ -5,7 +5,7 @@ import (
   "testing"
   "time"
 
-  . "github.com/Liquid-Labs/catalyst-core-model/go/coremodel"
+  . "github.com/Liquid-Labs/lc-entity-model/go/coremodel"
   "github.com/stretchr/testify/assert"
 )
 

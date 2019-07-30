@@ -4,19 +4,16 @@ import (
   "time"
 
   // "github.com/go-pg/pg"
-
-  // "github.com/Liquid-Labs/go-nullable-mysql/nulls"
-  // "github.com/Liquid-Labs/catalyst-sql/go/catsql"
 )
 
 type InternalID int64
 type PublicID string
 
-// Entity is the basic Catalyst base-type. It is used for "independent" objects
-// and data. Any item which is directly retrievable and/or an authorization
-// target or subject must embed the Entity type. An Entity should be considered
-// an "abstract" type and never created alone, but only as part of creating a
-// concrete, final type.
+// Entity is the base type for all independent entities in the Liquid Code
+// model. Any item which is directly retrievable, an authorization target, or
+// authorization subject must embed the Entity type. An Entity should be
+// considered an "abstract" type and never created directly, but only as part of
+// a concrete, final type.
 type Entity struct {
   // Note, the ID is for internal use only and may or may not be set depending
   // in the source of the item (client or backend).

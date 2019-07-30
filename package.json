@@ -1,7 +1,7 @@
 {
-  "name": "@liquid-labs/catalyst-core-model",
+  "name": "@liquid-labs/lc-entity-model",
   "version": "1.0.0-prototype.0",
-  "description": "Catalyst core component models.",
+  "description": "Defines Liquid Code foundational entity component models",
   "main": "dist/index.js",
   "bin": {
     "cloud-sql-proxy.sh": "./bin/cloud-sql-proxy.sh",
@@ -19,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Liquid-Labs/catalyst-core-model.git"
+    "url": "git+https://github.com/Liquid-Labs/lc-core-model.git"
   },
   "author": "Zane Rockenbaugh <zane@liquid-labs.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Liquid-Labs/catalyst-core-model/issues"
+    "url": "https://github.com/Liquid-Labs/lc-core-model/issues"
   },
-  "homepage": "https://github.com/Liquid-Labs/catalyst-core-model#readme",
+  "homepage": "https://github.com/Liquid-Labs/lc-core-model#readme",
   "catalyst": {
     "provides": [
       {
