@@ -1,11 +1,11 @@
-package coremodel_test
+package entities_test
 
 import (
   "reflect"
   "testing"
   "time"
 
-  . "github.com/Liquid-Labs/lc-entity-model/go/coremodel"
+  . "github.com/Liquid-Labs/lc-entity-model/go/entities"
   "github.com/stretchr/testify/assert"
 )
 

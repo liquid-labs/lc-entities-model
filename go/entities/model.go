@@ -1,4 +1,4 @@
-package coremodel
+package entities
 
 import (
   "time"
