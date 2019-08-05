@@ -32,11 +32,10 @@
       }
     ]
   },
-  "dependencies": {
-    "@liquid-labs/cloud-sql-proxy": "^1.0.0-alpha.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@liquid-labs/catalyst-scripts": "^1.0.0-alpha.22",
+    "@liquid-labs/cloud-sql-proxy": "^1.0.0-alpha.0",
     "@liquid-labs/lc-rdb-service": "^1.0.0-alpha.0",
     "@liquid-labs/liquid-dev-cloudsql": "^1.0.0-prototype.0"
   }
