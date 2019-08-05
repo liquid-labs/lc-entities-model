@@ -1,4 +1,4 @@
-module github.com/Liquid-Labs/lc-entity-model
+module github.com/Liquid-Labs/lc-entities-model
 
 require (
 	github.com/Liquid-Labs/terror v0.0.0

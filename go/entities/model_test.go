@@ -5,7 +5,7 @@ import (
   "testing"
   "time"
 
-  . "github.com/Liquid-Labs/lc-entity-model/go/entities"
+  . "github.com/Liquid-Labs/lc-entities-model/go/entities"
   "github.com/stretchr/testify/assert"
 )
 
