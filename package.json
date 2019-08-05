@@ -1,13 +1,8 @@
 {
   "name": "@liquid-labs/lc-entity-model",
-  "version": "1.0.0-prototype.0",
+  "version": "1.0.0-alpha.0",
   "description": "Defines Liquid Code foundational entity component models",
   "main": "dist/index.js",
-  "bin": {
-    "cloud-sql-proxy.sh": "./bin/cloud-sql-proxy.sh",
-    "cloud-sql-service.sh": "./bin/cloud-sql-service.sh",
-    "go-dev-server.sh": "./bin/go-dev-server.sh"
-  },
   "scripts": {
     "prebuild": "rm -rf ./dist/* && mkdir -p ./dist",
     "build": "catalyst-scripts build",
@@ -28,47 +23,21 @@
   },
   "homepage": "https://github.com/Liquid-Labs/lc-core-model#readme",
   "catalyst": {
-    "provides": [
+    "requires": [
       {
-        "name": "cloud-sql-service",
-        "interface-classes": [
-          "sql"
-        ],
-        "platform-types": [
-          "local",
-          "gcp"
-        ],
-        "purposes": [
-          "dev",
-          "test",
-          "pre-production",
-          "production"
-        ],
-        "ctrl-scripts": [
-          "cloud-sql-proxy.sh",
-          "cloud-sql-service.sh"
-        ],
-        "params-req": [
-          "GCP_PROJECT_ID",
-          "CLOUDSQL_INSTANCE_NAME",
-          "CLOUDSQL_CONNECTION_PROT",
-          "CLOUDSQL_CONNECTION_NAME",
-          "CLOUDSQL_PROXY_CONNECTION_NAME",
-          "CLOUDSQL_SERVICE_ACCT",
-          "CLOUDSQL_USER",
-          "CLOUDSQL_PASSWORD",
-          "CLOUDSQL_DB"
-        ],
+        "iface": "sql",
+        "params-req": [],
         "params-opt": [],
-        "config-const": {}
+        "config-const": []
       }
-    ],
-    "requires": []
+    ]
   },
   "dependencies": {
     "@liquid-labs/cloud-sql-proxy": "^1.0.0-alpha.0"
   },
   "devDependencies": {
-    "@liquid-labs/catalyst-scripts": "^1.0.0-alpha.22"
+    "@liquid-labs/catalyst-scripts": "^1.0.0-alpha.22",
+    "@liquid-labs/lc-rdb-service": "^1.0.0-alpha.0",
+    "@liquid-labs/liquid-dev-cloudsql": "^1.0.0-prototype.0"
   }
 }
