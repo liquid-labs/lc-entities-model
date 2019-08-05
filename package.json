@@ -1,5 +1,5 @@
 {
-  "name": "@liquid-labs/lc-entity-model",
+  "name": "@liquid-labs/lc-entities-model",
   "version": "1.0.0-alpha.0",
   "description": "Defines Liquid Code foundational entity component models",
   "main": "dist/index.js",
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Liquid-Labs/lc-core-model.git"
+    "url": "git+https://github.com/Liquid-Labs/lc-entities-model.git"
   },
   "author": "Zane Rockenbaugh <zane@liquid-labs.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Liquid-Labs/lc-core-model/issues"
+    "url": "https://github.com/Liquid-Labs/lc-entities-model/issues"
   },
-  "homepage": "https://github.com/Liquid-Labs/lc-core-model#readme",
+  "homepage": "https://github.com/Liquid-Labs/lc-entities-model#readme",
   "catalyst": {
     "requires": [
       {
