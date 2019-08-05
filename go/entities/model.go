@@ -66,18 +66,10 @@ func (e *Entity) Clone() *Entity {
 }
 
 func (e *Entity) CloneNew() *Entity {
-  return &Entity{
-    0,
-    ``,
-    e.Name,
-    e.Description,
-    e.OwnerID,
-    e.OwnerPubID,
-    e.PubliclyReadable,
-    e.CreatedAt,
-    e.LastUpdated,
-    e.DeletedAt,
-  }
+  newE := e.Clone()
+  newE.ID = 0
+  newE.PubID = ``
+  return newE
 }
 
 func (e *Entity) GetID() InternalID { return e.ID }
