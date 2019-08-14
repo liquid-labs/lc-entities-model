@@ -16,7 +16,7 @@ type ResourceName string
 // considered an "abstract" type and never created directly, but only as part of
 // a concrete, final type.
 type Entity struct {
-  tableName        struct{}     `sql:"entities,alias:entity,select:entities_owner_pub_id"`
+  tableName        struct{}     `sql:"entities,alias:entity"`
   // Note, the ID is for internal use only and may or may not be set depending
   // in the source of the item (client or backend).
   ID               EID          `json:"id" pg:",pk"`
@@ -79,6 +79,12 @@ func (e *Entity) CloneNew() *Entity {
 func (e *Entity) GetID() EID { return e.ID }
 
 func (e *Entity) GetResourceName() ResourceName { return e.ResourceName }
+
+func (e *Entity) GetName() string { return e.Name }
+func (e *Entity) SetName(n string) { e.Name = n }
+
+func (e *Entity) GetDescription() string { return e.Description }
+func (e *Entity) SetDescription(d string) { e.Description = d }
 
 func (e *Entity) GetOwnerID() EID { return e.OwnerID }
 func (e *Entity) SetOwnerID(pid EID) { e.OwnerID = pid }
