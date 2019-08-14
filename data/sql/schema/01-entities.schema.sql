@@ -11,9 +11,11 @@ CREATE TABLE entities (
   -- pub_id            CHAR(36) NOT NULL,
   -- Postgres
   pub_id            UUID NOT NULL DEFAULT uuid_generate_v4(),
+  resource_name     VARCHAR(128),
+  name              VARCHAR(128),
+  description       TEXT,
   owner_id          BIGINT, -- should only be null for Persons
   publicly_readable BOOLEAN,
-  containers        BIGINT[],
   created_at        TIMESTAMPTZ DEFAULT NOW(),
   last_updated      TIMESTAMPTZ,
   deleted_at        TIMESTAMPTZ,
@@ -55,3 +57,8 @@ CREATE TRIGGER entities_last_updated
   BEFORE INSERT OR UPDATE ON entities
   FOR EACH ROW
   EXECUTE PROCEDURE trigger_entities_last_updated();
+
+CREATE VIEW entities_owner_pub_id AS
+  SELECT e.*, o.pub_id AS owner_pub_id
+    FROM entities e
+    LEFT JOIN entities o ON e.owner_id=o.id;
