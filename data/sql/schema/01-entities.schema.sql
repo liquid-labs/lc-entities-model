@@ -30,8 +30,3 @@ CREATE TRIGGER entities_last_updated
   BEFORE INSERT OR UPDATE ON entities
   FOR EACH ROW
   EXECUTE PROCEDURE trigger_entities_last_updated();
-
-CREATE VIEW entities_owner_pub_id AS
-  SELECT e.*, o.pub_id AS owner_pub_id
-    FROM entities e
-    LEFT JOIN entities o ON e.owner_id=o.id;
