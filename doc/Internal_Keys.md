@@ -25,6 +25,7 @@ Once we have some scale and can test performance of JOINs under both regimes, we
 * [UUID or GUID as Primary Keys? Be Careful!](https://tomharrisonjr.com/uuid-or-guid-as-primary-keys-be-careful-7b2aa3dcb439) This article seems pretty influential and I believe was a primary driver in the original decision to use the dual-key model. Upon further review and digging deeper, it's not clear that his argument is supported empirically. I.e., it sounds good, but may not be as strong as it seems. The strongest point in practice may be "primary keys get around". What we really want is to understand the impact with large, many table joins.
 * [MySQL Insert Performance](http://kccoder.com/mysql/uuid-vs-int-insert-performance/) The original analysis was on MySQL, where the impact of UUID seems to be much more significant.
 * [INT4 VS INT8 VS UUID VS NUMERIC PERFORMANCE ON BIGGER JOINS](https://www.cybertec-postgresql.com/en/int4-vs-int8-vs-uuid-vs-numeric-performance-on-bigger-joins/) (on Postgres) the performance impact seems to be smaller. This, and other tests, are all pretty trivial, though. In our system, joining 6+ tables is not uncommon.
+* In the lc-entities-model project the last version to use the int/ext key regime was 25d7de8ddefcc4727dd840736f2630bd848d8eae.
 
 ## Appendix: Unsent writeup to go-pg maintainer.
 
