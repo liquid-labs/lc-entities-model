@@ -15,8 +15,6 @@ CREATE TABLE entities (
   CONSTRAINT entities_owner_refs_entities FOREIGN KEY (owner_id) REFERENCES entities ( id )
 );
 
-CREATE UNIQUE INDEX entities_pub_id_index ON entities (pub_id);
-
 CREATE OR REPLACE FUNCTION trigger_entities_last_updated()
   RETURNS TRIGGER AS '
 BEGIN

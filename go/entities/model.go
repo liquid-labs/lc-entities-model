@@ -30,8 +30,6 @@ type Entity struct {
   DeletedAt        time.Time    `pg:",soft_delete"`
 }
 
-// catsql.ForQuery(`Entity`, func(q *orm.Query) *orm.Query { return q.Join(`JOIN entities ownerEntitiy ON entity.owner_id=ownerEntity.id`).ColumnExpr(`ownerEntity.pub_id AS owner_pub_id`)})
-
 func NewEntity(
     exemplar Identifiable,
     name string,
