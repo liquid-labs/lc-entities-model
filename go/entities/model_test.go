@@ -21,12 +21,7 @@ func (te *TestEntity) GetResourceName() ResourceName {
 
 func TestNoIDOnCreate(t *testing.T) {
   e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
-  assert.Equal(t, InternalID(0), e.GetID())
-}
-
-func TestNoPubIDOnCreate(t *testing.T) {
-  e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
-  assert.Equal(t, PublicID(``), e.GetPubID())
+  assert.Equal(t, EID(``), e.GetID())
 }
 
 func TestNoCreatedAtOnCreate(t *testing.T) {
@@ -47,9 +42,8 @@ func TestNoDeletedAtOnCreate(t *testing.T) {
 func TestEntitiesClone(t *testing.T) {
   now := time.Now()
   orig := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
-  orig.ID = 1
-  orig.PubID = `abc`
-  orig.OwnerID = 2
+  orig.ID = EID(`abc`)
+  orig.OwnerID = EID(`owner-A`)
   orig.CreatedAt = now
   orig.LastUpdated = now.Add(100)
   orig.DeletedAt = now.Add(200)
@@ -57,13 +51,11 @@ func TestEntitiesClone(t *testing.T) {
 
   assert.Equal(t, orig, clone, "Clone does not match.")
 
-  clone.ID = 3
-  clone.PubID = `hij`
+  clone.ID = `hij`
   clone.ResourceName = `foos`
   clone.Name = `sally`
   clone.Description = `awesome`
-  clone.OwnerID = 4
-  clone.OwnerPubID = `owner-B`
+  clone.OwnerID = EID(`owner-B`)
   clone.PubliclyReadable = false
   clone.CreatedAt = orig.CreatedAt.Add(20)
   clone.LastUpdated = orig.LastUpdated.Add(20)
@@ -87,16 +79,14 @@ func TestEntitiesClone(t *testing.T) {
 func TestEntitiesCloneNew(t *testing.T) {
   now := time.Now()
   orig := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
-  orig.ID = 1
-  orig.PubID = `abc`
-  orig.OwnerID = 2
+  orig.ID = `abc`
+  orig.OwnerID = `owner-A`
   orig.CreatedAt = now
   orig.LastUpdated = now.Add(100)
   orig.DeletedAt = now.Add(200)
   clone := orig.CloneNew()
 
-  assert.Equal(t, InternalID(0), clone.ID)
-  assert.Equal(t, PublicID(``), clone.PubID)
+  assert.Equal(t, EID(``), clone.ID)
   assert.Equal(t, time.Time{}, clone.CreatedAt)
   assert.Equal(t, time.Time{}, clone.LastUpdated)
   assert.Equal(t, time.Time{}, clone.DeletedAt)
@@ -104,8 +94,7 @@ func TestEntitiesCloneNew(t *testing.T) {
   clone.Name = `sally`
   clone.ResourceName = `foos`
   clone.Description = `awesome`
-  clone.OwnerID = 4
-  clone.OwnerPubID = `owner-B`
+  clone.OwnerID = `owner-B`
   clone.PubliclyReadable = false
 
   // TODO: abstract this

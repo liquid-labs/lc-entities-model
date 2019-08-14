@@ -6,8 +6,8 @@ import (
   // "github.com/go-pg/pg"
 )
 
-type InternalID int64
-type PublicID string
+// EID is the 'Entity ID' type.
+type EID string
 type ResourceName string
 
 // Entity is the base type for all independent entities in the Liquid Code
@@ -19,13 +19,11 @@ type Entity struct {
   tableName        struct{}     `sql:"entities,alias:entity,select:entities_owner_pub_id"`
   // Note, the ID is for internal use only and may or may not be set depending
   // in the source of the item (client or backend).
-  ID               InternalID   `json:"-" sql:",pk"`
-  PubID            PublicID     `json:"pubId" pg:",unique,notnull"`
+  ID               EID          `json:"id" pg:",pk"`
   ResourceName     ResourceName `json:"resourceName"`
   Name             string       `json:"name"`
   Description      string       `json:"description"`
-  OwnerID          InternalID   `json:"-"`
-  OwnerPubID       PublicID     `json:"ownerPubId"`
+  OwnerID          EID          `json:"ownerPubId"`
   PubliclyReadable bool         `json:"publiclyReadable" pg:",notnull"`
   CreatedAt        time.Time    `json:createdAt`
   LastUpdated      time.Time    `json:"lastUpdated"`
@@ -38,17 +36,15 @@ func NewEntity(
     exemplar Identifiable,
     name string,
     description string,
-    ownerPubID PublicID,
+    ownerID EID,
     publiclyReadable bool) *Entity {
   return &Entity{
     struct{}{},
     exemplar.GetID(),
-    exemplar.GetPubID(),
     exemplar.GetResourceName(),
     name,
     description,
-    0,
-    ownerPubID,
+    ownerID,
     publiclyReadable,
     time.Time{},
     time.Time{},
@@ -60,12 +56,10 @@ func (e *Entity) Clone() *Entity {
   return &Entity{
     struct{}{},
     e.ID,
-    e.PubID,
     e.ResourceName,
     e.Name,
     e.Description,
     e.OwnerID,
-    e.OwnerPubID,
     e.PubliclyReadable,
     e.CreatedAt,
     e.LastUpdated,
@@ -75,24 +69,19 @@ func (e *Entity) Clone() *Entity {
 
 func (e *Entity) CloneNew() *Entity {
   newE := e.Clone()
-  newE.ID = 0
-  newE.PubID = ``
+  newE.ID = EID(``)
   newE.CreatedAt = time.Time{}
   newE.LastUpdated = time.Time{}
   newE.DeletedAt = time.Time{}
   return newE
 }
 
-func (e *Entity) GetID() InternalID { return e.ID }
-
-func (e *Entity) GetPubID() PublicID { return e.PubID }
+func (e *Entity) GetID() EID { return e.ID }
 
 func (e *Entity) GetResourceName() ResourceName { return e.ResourceName }
 
-func (e *Entity) GetOwnerID() InternalID { return e.OwnerID }
-
-func (e *Entity) GetOwnerPubID() PublicID { return e.OwnerPubID }
-func (e *Entity) SetOwnerPubID(pid PublicID) { e.OwnerPubID = pid }
+func (e *Entity) GetOwnerID() EID { return e.OwnerID }
+func (e *Entity) SetOwnerID(pid EID) { e.OwnerID = pid }
 
 func (e *Entity) IsPubliclyReadable() bool { return e.PubliclyReadable }
 func (e *Entity) SetPubliclyReadable(r bool) { e.PubliclyReadable = r }
@@ -104,7 +93,6 @@ func (e *Entity) GetLastUpdated() time.Time { return e.LastUpdated }
 func (e *Entity) GetDeletedAt() time.Time { return e.DeletedAt }
 
 type Identifiable interface {
-  GetID() InternalID
-  GetPubID() PublicID
+  GetID() EID
   GetResourceName() ResourceName
 }
