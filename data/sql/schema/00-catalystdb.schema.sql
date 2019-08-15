@@ -19,10 +19,3 @@ CREATE TRIGGER catalystdb_updated
   BEFORE INSERT ON catalystdb
   FOR EACH ROW
   EXECUTE PROCEDURE trigger_catalyst_db_updated();
-
--- MySQL
--- DELIMITER //
--- CREATE TRIGGER `catalystdb_updated`
---  BEFORE INSERT ON catalystdb FOR EACH ROW
---    SET new.last_update=UNIX_TIMESTAMP();//
--- DELIMITER ;

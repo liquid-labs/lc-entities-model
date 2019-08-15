@@ -1,8 +1,3 @@
--- MySQL
--- DROP FUNCTION IF EXISTS IS_NUMERIC;
--- CREATE FUNCTION IS_NUMERIC (val varchar(255)) RETURNS tinyint RETURN val REGEXP '^-?[0-9]+$';
-
--- Postgres
 CREATE OR REPLACE FUNCTION is_numeric (val varchar(255))
 RETURNS BOOLEAN AS $$
 SELECT val SIMILAR TO '^-?[0-9]+$'
