@@ -54,12 +54,13 @@ func checkDefaults(t *testing.T, e *Entity) {
   assert.NotEqual(t, time.Time{}, e.GetLastUpdated(), `'Last updated' should have been set on insert.`)
 }
 
-func (s *EntityIntegrationSuite) TestEntityCreateNoOwner() {
+func (s *EntityIntegrationSuite) TestEntityCreateSelfOwner() {
   e1 := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
   // model_test verifies that ID, PubID, CreatedAt, LastUpdated, and DeletedAt
   // are initialized to zero/empty values.
   require.NoError(s.T(), rdb.Connect().Insert(e1), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e1)
+  assert.Equal(s.T(), e1.GetID(), e1.GetOwnerID())
 }
 
 func (s *EntityIntegrationSuite) TestEntityCreateWithOwner() {
