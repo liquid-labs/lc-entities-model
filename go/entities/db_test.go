@@ -20,8 +20,8 @@ func init() {
 }
 
 func retrieveEntity(id EID) (*Entity, terror.Terror) {
-  e := &Entity{ID: id}
-  if err := rdb.Connect().Model(e).Where(`entity.id=?id`).Select(); err != nil && err != pg.ErrNoRows {
+  e, q := ModelEntity(rdb.Connect())
+  if err := q.Where(`entity.id=?`, id).Select(); err != nil && err != pg.ErrNoRows {
     return nil, terror.ServerError(`Problem retrieving entity.`, err)
   } else if err == pg.ErrNoRows {
     return nil, nil
@@ -34,11 +34,8 @@ type EntityIntegrationSuite struct {
   suite.Suite
   DB *pg.DB
 }
-func (s *EntityIntegrationSuite) SetupSuite() {
-  s.DB = rdb.Connect()
-}
 func (s *EntityIntegrationSuite) TearDownSuite() {
-  s.DB.Close()
+  rdb.Connect().Close()
 }
 func TestEntityIntegrationSuite(t *testing.T) {
   if os.Getenv(`SKIP_INTEGRATION`) == `true` {
@@ -56,28 +53,25 @@ func checkDefaults(t *testing.T, e *Entity) {
 
 func (s *EntityIntegrationSuite) TestEntityCreateSelfOwner() {
   e1 := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
-  // model_test verifies that ID, PubID, CreatedAt, LastUpdated, and DeletedAt
-  // are initialized to zero/empty values.
-  require.NoError(s.T(), rdb.Connect().Insert(e1), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e1.Create(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e1)
   assert.Equal(s.T(), e1.GetID(), e1.GetOwnerID())
 }
 
 func (s *EntityIntegrationSuite) TestEntityCreateWithOwner() {
   e1 := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
-  require.NoError(s.T(), rdb.Connect().Insert(e1))
-  e2 := NewEntity(&TestEntity{}, `name`, `description`, e1.GetID(), false)
-  // model_test verifies that ID, PubID, CreatedAt, LastUpdated, and DeletedAt
-  // are initialized to zero/empty values.
+  require.NoError(s.T(), e1.Create(rdb.Connect()))
 
-  require.NoError(s.T(), rdb.Connect().Insert(e2), `Unexpected error creating test entity`)
+  e2 := NewEntity(&TestEntity{}, `name`, `description`, e1.GetID(), false)
+  require.NoError(s.T(), e2.Create(rdb.Connect()), `Unexpected error creating test entity`)
+
   assert.Equal(s.T(), e1.GetID(), e2.GetOwnerID())
   checkDefaults(s.T(), e2)
 }
 
 func (s *EntityIntegrationSuite) TestEntityRetrieve() {
   e := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
-  require.NoError(s.T(), rdb.Connect().Insert(e), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.Create(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
   eCopy, err := retrieveEntity(e.GetID())
   require.NoError(s.T(), err)
@@ -86,36 +80,31 @@ func (s *EntityIntegrationSuite) TestEntityRetrieve() {
 
 func (s *EntityIntegrationSuite) TestEntityUpdate() {
   e := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
-  require.NoError(s.T(), rdb.Connect().Insert(e), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.Create(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
   e.SetName(`foo`)
   e.SetDescription(`bar`)
   e.SetPubliclyReadable(true)
-  require.NoError(s.T(), rdb.Connect().Update(e))
+  require.NoError(s.T(), e.Update(rdb.Connect()))
   assert.Equal(s.T(), `foo`, e.GetName())
   assert.Equal(s.T(), `bar`, e.GetDescription())
   assert.Equal(s.T(), true, e.IsPubliclyReadable())
   eCopy, err := retrieveEntity(e.GetID())
   require.NoError(s.T(), err)
-  assert.NotEqual(s.T(), e.GetLastUpdated(), eCopy.GetLastUpdated())
-  eCopy.LastUpdated = e.LastUpdated
   assert.Equal(s.T(), e, eCopy)
 }
 
 func (s *EntityIntegrationSuite) TestEntityArchive() {
   e := NewEntity(&TestEntity{}, `name`, `description`, ``, false)
-  require.NoError(s.T(), rdb.Connect().Insert(e), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.Create(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
-  // go-pg v8: last updated and 'deleted_at' get out of sync if not returned. E.g.:
-  // rdb.Connect().Delete(e) will fail the test.
-  _, err := rdb.Connect().Model(e).Returning(`"last_updated", "deleted_at"`).Where(`entity.id=?id`).Delete()
-  require.NoError(s.T(), err)
+  require.NoError(s.T(), e.Archive(rdb.Connect()))
 
   eCopy, err := retrieveEntity(e.GetID())
   require.NoError(s.T(), err)
   assert.Nil(s.T(), eCopy)
 
-  archived := &Entity{ID: e.GetID()}
-  assert.NoError(s.T(), rdb.Connect().Model(archived).Where(`entity.id=?id`).Deleted().Select())
+  archived, q := ModelEntity(rdb.Connect())
+  assert.NoError(s.T(), q.Where(`entity.id=?`, e.GetID()).Deleted().Select())
   assert.Equal(s.T(), e, archived)
 }
