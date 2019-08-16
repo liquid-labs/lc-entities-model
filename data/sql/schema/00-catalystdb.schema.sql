@@ -13,8 +13,6 @@ BEGIN
   RETURN NEW;
 END' LANGUAGE 'plpgsql';
 
-DROP EVENT TRIGGER IF EXISTS catalystdb_updated;
-
 CREATE TRIGGER catalystdb_updated
   BEFORE INSERT ON catalystdb
   FOR EACH ROW
