@@ -14,6 +14,7 @@ var EntityFields = []string{
   `publicly_readable`,
   `created_at`,
   `last_updated`,
+  `deleted_at`,
 }
 
 // ModelEntity provides a(n initially empty) Entity receiver and base query.
