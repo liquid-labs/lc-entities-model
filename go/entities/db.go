@@ -22,7 +22,7 @@ var EntityFields = []string{
 func CreateEntityRaw(eb Entable, db orm.DB) Terror {
   if !eb.IsConcrete() && env.IsProduction() {
     // TODO: improve this error message
-    return BadRequestError(`Attempt to create non-concrete entity in prdouction.`, nil)
+    return BadRequestError(`Attempt to create non-concrete entity in prdouction.`)
   } else {
     if err := db.Insert(eb.GetEntity()); err != nil {
       return ServerError(`There was a problem creating the entity record.`, err)
