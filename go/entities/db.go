@@ -3,6 +3,7 @@ package entities
 import (
   "github.com/go-pg/pg/orm"
 
+  "github.com/Liquid-Labs/env/go/env"
   . "github.com/Liquid-Labs/terror/go/terror"
 )
 
@@ -17,25 +18,22 @@ var EntityFields = []string{
   `deleted_at`,
 }
 
-// ModelEntity provides a(n initially empty) Entity receiver and base query.
-func ModelEntity(db orm.DB) (*Entity, *orm.Query) {
-  e := &Entity{}
-  q := db.Model(e)
-
-  return e, q
-}
-
 // Create creates (or inserts) a new Entity record into the DB. As Entities are logically abstract, one would typically only call this as part of another items create sequence.
-func (e *Entity) Create(db orm.DB) Terror {
-  if err := db.Insert(e); err != nil {
-    return ServerError(`There was a problem creating the entity record.`, err)
+func CreateEntityRaw(eb Entable, db orm.DB) Terror {
+  if !eb.IsConcrete() && env.IsProduction() {
+    // TODO: improve this error message
+    return BadRequestError(`Attempt to create non-concrete entity in prdouction.`, nil)
   } else {
-    return nil
+    if err := db.Insert(eb.GetEntity()); err != nil {
+      return ServerError(`There was a problem creating the entity record.`, err)
+    } else {
+      return nil
+    }
   }
 }
 
 // Update updates an Entity record in the DB. As Entities are logically abstract, one would typically only call this as part of another items update sequence.
-func (e *Entity) Update(db orm.DB) Terror {
+func (e *Entity) UpdateRaw(db orm.DB) Terror {
   q := db.Model(e).
     Where(`entity.id=?id`).
     // go-pg doesn't know these are auto changed
@@ -48,7 +46,7 @@ func (e *Entity) Update(db orm.DB) Terror {
 }
 
 // Archive updates an Entity record in the DB. As Entities are logically abstract, one would typically only call this as part of another items archive sequence.
-func (e *Entity) Archive(db orm.DB) Terror {
+func (e *Entity) ArchiveRaw(db orm.DB) Terror {
   q := db.Model(e).
     Where(`entity.id=?id`).
     // go-pg doesn't know these are

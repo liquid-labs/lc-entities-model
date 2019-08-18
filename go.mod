@@ -1,6 +1,7 @@
 module github.com/Liquid-Labs/lc-entities-model
 
 require (
+	github.com/Liquid-Labs/env v1.0.0-beta.0
 	github.com/Liquid-Labs/lc-rdb-service v1.0.0-alpha.1
 	github.com/Liquid-Labs/terror v1.0.0-alpha.0
 	github.com/go-pg/pg v8.0.5+incompatible

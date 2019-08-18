@@ -11,37 +11,17 @@ import (
   . "github.com/Liquid-Labs/lc-entities-model/go/entities"
 )
 
-type TestEntity struct {
-  Entity
-}
-
-func (te *TestEntity) GetResourceName() ResourceName {
-  return ResourceName(`testentities`)
-}
-
-func TestNoIDOnCreate(t *testing.T) {
-  e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
+func TestEmptyDefaultsWhenNew(t *testing.T) {
+  e := NewEntity(`entities`, `john`, `cool`, `owner-A`, true)
   assert.Equal(t, EID(``), e.GetID())
-}
-
-func TestNoCreatedAtOnCreate(t *testing.T) {
-  e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
   assert.Equal(t, time.Time{}, e.GetCreatedAt())
-}
-
-func TestNoLastUpdatedOnCreate(t *testing.T) {
-  e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
   assert.Equal(t, time.Time{}, e.GetLastUpdated())
-}
-
-func TestNoDeletedAtOnCreate(t *testing.T) {
-  e := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
   assert.Equal(t, time.Time{}, e.GetDeletedAt())
 }
 
 func TestEntitiesClone(t *testing.T) {
   now := time.Now()
-  orig := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
+  orig := NewEntity(`entities`, `john`, `cool`, `owner-A`, true)
   orig.ID = EID(`abc`)
   orig.OwnerID = EID(`owner-A`)
   orig.CreatedAt = now
@@ -78,7 +58,7 @@ func TestEntitiesClone(t *testing.T) {
 
 func TestEntitiesCloneNew(t *testing.T) {
   now := time.Now()
-  orig := NewEntity(&TestEntity{}, `john`, `cool`, `owner-A`, true)
+  orig := NewEntity(`entities`, `john`, `cool`, `owner-A`, true)
   orig.ID = `abc`
   orig.OwnerID = `owner-A`
   orig.CreatedAt = now

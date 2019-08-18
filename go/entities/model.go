@@ -2,13 +2,19 @@ package entities
 
 import (
   "time"
-
-  // "github.com/go-pg/pg"
 )
 
 // EID is the 'Entity ID' type.
 type EID string
 type ResourceName string
+
+// Entable provides the necessary interface for creating raw Entities. And som convenience methods as well.
+type Entable interface {
+  IsConcrete() bool
+  GetEntity() *Entity
+  GetID() EID
+  GetResourceName() ResourceName
+}
 
 // Entity is the base type for all independent entities in the Liquid Code
 // model. Any item which is directly retrievable, an authorization target, or
@@ -31,22 +37,18 @@ type Entity struct {
 }
 
 func NewEntity(
-    exemplar Identifiable,
+    resourceName ResourceName,
     name string,
     description string,
     ownerID EID,
     publiclyReadable bool) *Entity {
   return &Entity{
-    struct{}{},
-    exemplar.GetID(),
-    exemplar.GetResourceName(),
-    name,
-    description,
-    ownerID,
-    publiclyReadable,
-    time.Time{},
-    time.Time{},
-    time.Time{},
+    ResourceName: resourceName,
+    Name: name,
+    Description: description,
+    OwnerID: ownerID,
+    PubliclyReadable: publiclyReadable,
+    // all timestamps initialize to 0-val == empty; the data is inherently ephemeral
   }
 }
 
@@ -74,9 +76,16 @@ func (e *Entity) CloneNew() *Entity {
   return newE
 }
 
+func (e *Entity) IsConcrete() bool { return false }
+
+func (e *Entity) GetEntity() *Entity { return e }
+
 func (e *Entity) GetID() EID { return e.ID }
 
-func (e *Entity) GetResourceName() ResourceName { return e.ResourceName }
+func (e *Entity) GetResourceName() ResourceName {
+  if e.ResourceName != `` { return e.ResourceName
+  } else { return ResourceName(`entities`) }
+}
 
 func (e *Entity) GetName() string { return e.Name }
 func (e *Entity) SetName(n string) { e.Name = n }
@@ -95,8 +104,3 @@ func (e *Entity) GetCreatedAt() time.Time { return e.CreatedAt }
 func (e *Entity) GetLastUpdated() time.Time { return e.LastUpdated }
 
 func (e *Entity) GetDeletedAt() time.Time { return e.DeletedAt }
-
-type Identifiable interface {
-  GetID() EID
-  GetResourceName() ResourceName
-}
