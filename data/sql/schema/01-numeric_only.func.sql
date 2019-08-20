@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION numeric_only (val VARCHAR(255))
      len := LENGTH(val);
      WHILE idx <= len LOOP
        c := SUBSTRING(val FROM idx FOR 1);
-       IF IS_NUMERIC(c) = 1 THEN
+       IF IS_NUMERIC(c) THEN
          res := CONCAT(res, c);
        END IF;
        idx := idx + 1;

@@ -1,4 +1,4 @@
 CREATE OR REPLACE FUNCTION is_numeric (val varchar(255))
 RETURNS BOOLEAN AS $$
-SELECT val SIMILAR TO '^-?[0-9]+$'
+SELECT val ~ '^-?[0-9]+$'
 $$ LANGUAGE SQL;
