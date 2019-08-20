@@ -54,17 +54,17 @@ func checkDefaults(t *testing.T, e *Entity) {
 
 func (s *EntityIntegrationSuite) TestEntityCreateSelfOwner() {
   e1 := NewEntity(`entities`, `name`, `description`, ``, false)
-  require.NoError(s.T(), CreateEntityRaw(e1, rdb.Connect()), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e1.CreateRaw(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e1)
   assert.Equal(s.T(), e1.GetID(), e1.GetOwnerID())
 }
 
 func (s *EntityIntegrationSuite) TestEntityCreateWithOwner() {
   e1 := NewEntity(`entities`, `name`, `description`, ``, false)
-  require.NoError(s.T(), CreateEntityRaw(e1, rdb.Connect()))
+  require.NoError(s.T(), e1.CreateRaw(rdb.Connect()))
 
   e2 := NewEntity(`entities`, `name`, `description`, e1.GetID(), false)
-  require.NoError(s.T(), CreateEntityRaw(e2, rdb.Connect()), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e2.CreateRaw(rdb.Connect()), `Unexpected error creating test entity`)
 
   assert.Equal(s.T(), e1.GetID(), e2.GetOwnerID())
   checkDefaults(s.T(), e2)
@@ -72,7 +72,7 @@ func (s *EntityIntegrationSuite) TestEntityCreateWithOwner() {
 
 func (s *EntityIntegrationSuite) TestEntityRetrieve() {
   e := NewEntity(`entities`, `name`, `description`, ``, false)
-  require.NoError(s.T(), CreateEntityRaw(e, rdb.Connect()), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.CreateRaw(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
   eCopy, err := retrieveEntity(e.GetID())
   require.NoError(s.T(), err)
@@ -81,7 +81,7 @@ func (s *EntityIntegrationSuite) TestEntityRetrieve() {
 
 func (s *EntityIntegrationSuite) TestEntityUpdate() {
   e := NewEntity(`entities`, `name`, `description`, ``, false)
-  require.NoError(s.T(), CreateEntityRaw(e, rdb.Connect()), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.CreateRaw(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
   e.SetName(`foo`)
   e.SetDescription(`bar`)
@@ -97,7 +97,7 @@ func (s *EntityIntegrationSuite) TestEntityUpdate() {
 
 func (s *EntityIntegrationSuite) TestEntityArchive() {
   e := NewEntity(`entities`, `name`, `description`, ``, false)
-  require.NoError(s.T(), CreateEntityRaw(e, rdb.Connect()), `Unexpected error creating test entity`)
+  require.NoError(s.T(), e.CreateRaw(rdb.Connect()), `Unexpected error creating test entity`)
   checkDefaults(s.T(), e)
   require.NoError(s.T(), e.ArchiveRaw(rdb.Connect()))
 
@@ -109,12 +109,4 @@ func (s *EntityIntegrationSuite) TestEntityArchive() {
   q := rdb.Connect().Model(archived).Where(`entity.id=?`, e.GetID()).Deleted()
   assert.NoError(s.T(), q.Select())
   assert.Equal(s.T(), e, archived)
-}
-
-func (s *EntityIntegrationSuite) TestCreateEntityOnProduction() {
-  e := NewEntity(`entities`, `name`, `description`, ``, false)
-  currEnv := env.GetType()
-  env.Set(env.DefaultEnvTypeKey, `production`)
-  assert.Error(s.T(), CreateEntityRaw(e, rdb.Connect()))
-  env.Set(env.DefaultEnvTypeKey, currEnv)
 }

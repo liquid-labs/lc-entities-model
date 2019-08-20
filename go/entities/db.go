@@ -3,7 +3,6 @@ package entities
 import (
   "github.com/go-pg/pg/orm"
 
-  "github.com/Liquid-Labs/env/go/env"
   . "github.com/Liquid-Labs/terror/go/terror"
 )
 
@@ -23,12 +22,8 @@ func (e *Entity) CreateQueries(db orm.DB) []*orm.Query {
 }
 
 // Create creates (or inserts) a new Entity record into the DB. As Entities are logically abstract, one would typically only call this as part of another items create sequence.
-func CreateEntityRaw(eb Entable, db orm.DB) Terror {
-  if !eb.IsConcrete() && env.IsProduction() {
-    // TODO: improve this error message
-    return BadRequestError(`Attempt to create non-concrete entity in prdouction.`)
-  }
-  return RunStateQueries(eb.GetEntity().CreateQueries(db), CreateOp)
+func (e *Entity) CreateRaw( db orm.DB) Terror {
+  return RunStateQueries(e.CreateQueries(db), CreateOp)
 }
 
 func (e *Entity) UpdateQueries(db orm.DB) []*orm.Query {
