@@ -6,7 +6,7 @@ CREATE TABLE entities (
   resource_name     VARCHAR(128) NOT NULL,
   name              VARCHAR(128),
   description       TEXT,
-  owner_id          UUID NOT NULL, -- should only be used for Persons (?)
+  owner_id          UUID NOT NULL,
   publicly_readable BOOLEAN NOT NULL DEFAULT false,
   created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_updated      TIMESTAMPTZ NOT NULL,
@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION trigger_protect_entity_created_at()
   RETURNS TRIGGER AS $$
     BEGIN
       IF NEW.created_at != OLD.created_at THEN
-        RAISE EXCEPTION 'Entity created timestamp cannot be changed.';        
+        RAISE EXCEPTION 'Entity created timestamp cannot be changed.';
       ELSE
         RETURN NEW;
       END IF;
