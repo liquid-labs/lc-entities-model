@@ -6,9 +6,75 @@ import (
 
   "github.com/go-pg/pg"
   "github.com/go-pg/pg/orm"
-
-  . "github.com/Liquid-Labs/terror/go/terror"
 )
+
+// retrieval is already easy in the simple case and arbitrary in other cases, so we don't attempt to abstract it. Rather, it's best to just interact with the go-pg tools directly. The item manager deals with transactional, state change methods.
+type creatable interface { CreateQueries(orm.DB) []*orm.Query }
+type updatable interface { UpdateQueries(orm.DB) []*orm.Query }
+type archivable interface { ArchiveQueries(orm.DB) []*orm.Query }
+type deletable interface { DeleteQueries(orm.DB) []*orm.Query }
+
+type ItemManager struct {
+  db                     *pg.DB
+  tx                     *pg.Tx
+  allowUnsafeStateChange bool
+}
+func NewItemManager(db *pg.DB) *ItemManager {
+  return &ItemManager{db:db, allowUnsafeStateChange:false}
+}
+func (im *ItemManager) AllowUnsafeStateChange(b bool) {
+  im.allowUnsafeStateChange = b
+}
+func (im *ItemManager) getDB() orm.DB {
+  if im.tx != nil { return im.tx } else { return im.db }
+}
+func (im *ItemManager) StartTransaction() error {
+  if im.tx != nil {
+    return fmt.Errorf(`Attempt to start transaction while in a transaction.`)
+  }
+  tx, err := im.db.Begin()
+  if err != nil { im.tx = tx }
+  return err
+}
+func (im *ItemManager) dropTransaction() { im.tx = nil }
+func (im *ItemManager) CommitTransaction() error {
+  if im.tx == nil {
+    return fmt.Errorf(`Attempt to commit non-existent transaction.`)
+  }
+  defer im.dropTransaction()
+  return im.tx.Commit()
+}
+func (im *ItemManager) RollbackTransaction() error {
+  if im.tx == nil {
+    return fmt.Errorf(`Attempt to rollback non-existent transaction.`)
+  }
+  defer im.dropTransaction()
+  return im.tx.Rollback()
+}
+
+func (im *ItemManager) doStateChangeOp(qs []*orm.Query, op *stateOp) error {
+  if !im.allowUnsafeStateChange {
+    return fmt.Errorf(`Attempt to perform '%s' outside of transaction context.`, op.desc)
+  } else {
+    return RunStateQueries(qs, op)
+  }
+}
+
+func (im *ItemManager) CreateRaw(item creatable) error {
+  return im.doStateChangeOp(item.CreateQueries(im.db), CreateOp)
+}
+
+func (im *ItemManager) UpdateRaw(item updatable) error {
+  return im.doStateChangeOp(item.UpdateQueries(im.db), UpdateOp)
+}
+
+func (im *ItemManager) ArchiveRaw(item archivable) error {
+  return im.doStateChangeOp(item.ArchiveQueries(im.db), ArchiveOp)
+}
+
+func (im *ItemManager) DeleteRaw(item deletable) error {
+  return im.doStateChangeOp(item.DeleteQueries(im.db), DeleteOp)
+}
 
 // State ops:
 // * potentially have mulitple steps (== queries).
@@ -47,15 +113,15 @@ var DeleteOp = &stateOp{
   `delete`,
 }
 
-func RunStateQueries(qs []*orm.Query, op *stateOp) Terror {
+func RunStateQueries(qs []*orm.Query, op *stateOp) error {
   for _, q := range qs {
     if res, err := op.f(q); err != nil {
       resourceName := q.GetModel().Table().Name
-      return ServerError(fmt.Sprintf(`Error attempting %s on %s .`, op.desc, resourceName), nil)
+      return fmt.Errorf(`Error attempting %s %s item; %s.`, op.desc, resourceName, err)
     } else if q.GetModel().Kind() == reflect.Struct && res.RowsAffected() > 1 {
       // each singular state query should only effect one row (yes?); this may turn out to be too restrictive in some case, but we include it for now as a sanity / data integrety check. In particular, the fear is a rogue query lacking the proper 'Where', and so we want to detect the unexpected and complain so it can be caught in test.
       // go-pg may already be doing a similar check, but the docs are so poor it's unclear and don't want to spend enough time reading code to be sure.
-      return ServerError(`Unexpected change to multiple rows.`, nil)
+      return fmt.Errorf(`Unexpected change to multiple rows.`)
     }
   }
   // if we fall out of the loop with no errors, then we're all good.
@@ -102,10 +168,10 @@ var ListOp = &retrieveOp{
   `list`,
 }
 
-func RunRetrieveOp(q *orm.Query, op *retrieveOp) (int, Terror) {
+func RunRetrieveOp(q *orm.Query, op *retrieveOp) (int, error) {
   if count, err := op.f(q); err != nil {
     resourceName := q.GetModel().Table().Name
-    return count, ServerError(fmt.Sprintf(`Error attempting %s on %s .`, op.desc, resourceName), nil)
+    return count, fmt.Errorf(`Error attempting %s on %s .`, op.desc, resourceName)
   } else {
     return count, nil
   }

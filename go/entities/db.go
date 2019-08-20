@@ -2,8 +2,6 @@ package entities
 
 import (
   "github.com/go-pg/pg/orm"
-
-  . "github.com/Liquid-Labs/terror/go/terror"
 )
 
 var EntityFields = []string{
@@ -21,9 +19,8 @@ func (e *Entity) CreateQueries(db orm.DB) []*orm.Query {
   return []*orm.Query{ db.Model(e) }
 }
 
-// Create creates (or inserts) a new Entity record into the DB. As Entities are logically abstract, one would typically only call this as part of another items create sequence.
-func (e *Entity) CreateRaw( db orm.DB) Terror {
-  return RunStateQueries(e.CreateQueries(db), CreateOp)
+func (e *Entity) RetrieveByIDQueries(id EID, db orm.DB) *orm.Query {
+  return db.Model(e).Where(`"entity".id=?`, id)
 }
 
 func (e *Entity) UpdateQueries(db orm.DB) []*orm.Query {
@@ -34,11 +31,6 @@ func (e *Entity) UpdateQueries(db orm.DB) []*orm.Query {
   return []*orm.Query{ q }
 }
 
-// Update updates an Entity record in the DB. As Entities are logically abstract, one would typically only call this as part of another items update sequence.
-func (e *Entity) UpdateRaw(db orm.DB) Terror {
-  return RunStateQueries(e.UpdateQueries(db), UpdateOp)
-}
-
 func (e *Entity) ArchiveQueries(db orm.DB) []*orm.Query {
   q := db.Model(e).
     Where(`entity.id=?id`).
@@ -47,17 +39,8 @@ func (e *Entity) ArchiveQueries(db orm.DB) []*orm.Query {
   return []*orm.Query{ q }
 }
 
-// Archive updates an Entity record in the DB. As Entities are logically abstract, one would typically only call this as part of another items archive sequence.
-func (e *Entity) ArchiveRaw(db orm.DB) Terror {
-  return RunStateQueries(e.ArchiveQueries(db), ArchiveOp)
-}
-
 func (e *Entity) DeleteQueries(db orm.DB) []*orm.Query {
   q := db.Model(e).
     Where(`entity.id=?id`)
   return []*orm.Query{ q }
-}
-
-func (e *Entity) Delete(db orm.DB) Terror {
-  return RunStateQueries(e.DeleteQueries(db), DeleteOp)
 }
