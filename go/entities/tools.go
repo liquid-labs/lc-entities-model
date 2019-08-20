@@ -17,13 +17,10 @@ type deletable interface { DeleteQueries(orm.DB) []*orm.Query }
 type ItemManager struct {
   db                     *pg.DB
   tx                     *pg.Tx
-  allowUnsafeStateChange bool
+  AllowUnsafeStateChange bool
 }
 func NewItemManager(db *pg.DB) *ItemManager {
-  return &ItemManager{db:db, allowUnsafeStateChange:false}
-}
-func (im *ItemManager) AllowUnsafeStateChange(b bool) {
-  im.allowUnsafeStateChange = b
+  return &ItemManager{db:db, AllowUnsafeStateChange:false}
 }
 func (im *ItemManager) getDB() orm.DB {
   if im.tx != nil { return im.tx } else { return im.db }
@@ -53,7 +50,7 @@ func (im *ItemManager) RollbackTransaction() error {
 }
 
 func (im *ItemManager) doStateChangeOp(qs []*orm.Query, op *stateOp) error {
-  if !im.allowUnsafeStateChange {
+  if !im.AllowUnsafeStateChange {
     return fmt.Errorf(`Attempt to perform '%s' outside of transaction context.`, op.desc)
   } else {
     return RunStateQueries(qs, op)

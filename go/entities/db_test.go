@@ -31,7 +31,7 @@ type EntityIntegrationSuite struct {
 }
 func (s *EntityIntegrationSuite) SetupSuite() {
   s.IM = NewItemManager(rdb.Connect())
-  s.IM.AllowUnsafeStateChange(true)
+  s.IM.AllowUnsafeStateChange = true
 }
 func TestEntityIntegrationSuite(t *testing.T) {
   if env.Get(`SKIP_INTEGRATION`) == `true` {
