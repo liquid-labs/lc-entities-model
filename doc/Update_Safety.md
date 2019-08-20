@@ -1,0 +1,1 @@
+An important consequence of the exception raised on any attempted change to 'last_udpated' is that undetected runaway updates are difficult, so long as the updates include the objects 'last_updated' timestamp. If an update goes beyond the single entity, then the timestamps for other entities will not match and the update will fail with an exception.
