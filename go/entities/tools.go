@@ -2,10 +2,13 @@ package entities
 
 import (
   "fmt"
+  "os"
   "reflect"
 
   "github.com/go-pg/pg"
   "github.com/go-pg/pg/orm"
+
+  "github.com/Liquid-Labs/lc-rdb-service/go/rdb"
 )
 
 // retrieval is already easy in the simple case and arbitrary in other cases, so we don't attempt to abstract it. Rather, it's best to just interact with the go-pg tools directly. The item manager deals with transactional, state change methods.
@@ -19,8 +22,20 @@ type ItemManager struct {
   tx                     *pg.Tx
   AllowUnsafeStateChange bool
 }
+func ConnectItemManager() *ItemManager {
+  im := &ItemManager{db:rdb.Connect(), AllowUnsafeStateChange:false}
+  im.init()
+  return im
+}
 func NewItemManager(db *pg.DB) *ItemManager {
-  return &ItemManager{db:db, AllowUnsafeStateChange:false}
+  im := &ItemManager{db:db, AllowUnsafeStateChange:false}
+  im.init()
+  return im
+}
+func (im *ItemManager) init() {
+  if os.Getenv(`ALLOW_UNSAFE_STATE_CHANGES`) != `` {
+    im.AllowUnsafeStateChange = true
+  }
 }
 func (im *ItemManager) getDB() orm.DB {
   if im.tx != nil { return im.tx } else { return im.db }
