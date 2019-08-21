@@ -1,6 +1,8 @@
 package entities
 
 import (
+  "context"
+  "log"
   "fmt"
   "os"
   "reflect"
@@ -27,36 +29,44 @@ func ConnectItemManager() *ItemManager {
   im.init()
   return im
 }
-func NewItemManager(db *pg.DB) *ItemManager {
-  im := &ItemManager{db:db, AllowUnsafeStateChange:false}
-  im.init()
+
+func ConnectItemManagerWithContext(ctx context.Context) *ItemManager {
+  im := ConnectItemManager()
+  im.db = im.db.WithContext(ctx)
   return im
 }
+
 func (im *ItemManager) init() {
   if os.Getenv(`ALLOW_UNSAFE_STATE_CHANGES`) != `` {
     im.AllowUnsafeStateChange = true
   }
 }
-func (im *ItemManager) getDB() orm.DB {
+
+func (im *ItemManager) GetDB() orm.DB {
   if im.tx != nil { return im.tx } else { return im.db }
 }
-func (im *ItemManager) StartTransaction() error {
+
+func (im *ItemManager) Begin() (*pg.Tx, error) {
   if im.tx != nil {
-    return fmt.Errorf(`Attempt to start transaction while in a transaction.`)
+    return nil, fmt.Errorf(`Attempt to start transaction while in a transaction.`)
   }
   tx, err := im.db.Begin()
-  if err != nil { im.tx = tx }
-  return err
+  if err != nil { return tx, err  }
+  im.tx = tx
+  return im.tx, nil
 }
+
 func (im *ItemManager) dropTransaction() { im.tx = nil }
-func (im *ItemManager) CommitTransaction() error {
+
+func (im *ItemManager) Commit() error {
   if im.tx == nil {
     return fmt.Errorf(`Attempt to commit non-existent transaction.`)
   }
   defer im.dropTransaction()
   return im.tx.Commit()
 }
-func (im *ItemManager) RollbackTransaction() error {
+
+func (im *ItemManager) Rollback() error {
   if im.tx == nil {
     return fmt.Errorf(`Attempt to rollback non-existent transaction.`)
   }
@@ -65,7 +75,8 @@ func (im *ItemManager) RollbackTransaction() error {
 }
 
 func (im *ItemManager) doStateChangeOp(qs []*orm.Query, op *stateOp) error {
-  if !im.AllowUnsafeStateChange {
+  if im.tx == nil && !im.AllowUnsafeStateChange {
+    log.Panicf("\n\ntx: %+v\n\n", im.tx)
     return fmt.Errorf(`Attempt to perform '%s' outside of transaction context.`, op.desc)
   } else {
     return RunStateQueries(qs, op)
@@ -73,19 +84,19 @@ func (im *ItemManager) doStateChangeOp(qs []*orm.Query, op *stateOp) error {
 }
 
 func (im *ItemManager) CreateRaw(item creatable) error {
-  return im.doStateChangeOp(item.CreateQueries(im.db), CreateOp)
+  return im.doStateChangeOp(item.CreateQueries(im.GetDB()), CreateOp)
 }
 
 func (im *ItemManager) UpdateRaw(item updatable) error {
-  return im.doStateChangeOp(item.UpdateQueries(im.db), UpdateOp)
+  return im.doStateChangeOp(item.UpdateQueries(im.GetDB()), UpdateOp)
 }
 
 func (im *ItemManager) ArchiveRaw(item archivable) error {
-  return im.doStateChangeOp(item.ArchiveQueries(im.db), ArchiveOp)
+  return im.doStateChangeOp(item.ArchiveQueries(im.GetDB()), ArchiveOp)
 }
 
 func (im *ItemManager) DeleteRaw(item deletable) error {
-  return im.doStateChangeOp(item.DeleteQueries(im.db), DeleteOp)
+  return im.doStateChangeOp(item.DeleteQueries(im.GetDB()), DeleteOp)
 }
 
 // State ops:
