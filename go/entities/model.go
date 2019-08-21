@@ -8,14 +8,6 @@ import (
 type EID string
 type ResourceName string
 
-// Entable provides the necessary interface for creating raw Entities. And som convenience methods as well.
-type Entable interface {
-  IsConcrete() bool
-  GetEntity() *Entity
-  GetID() EID
-  GetResourceName() ResourceName
-}
-
 // Entity is the base type for all independent entities in the Liquid Code
 // model. Any item which is directly retrievable, an authorization target, or
 // authorization subject must embed the Entity type. An Entity should be
@@ -82,10 +74,7 @@ func (e *Entity) GetEntity() *Entity { return e }
 
 func (e *Entity) GetID() EID { return e.ID }
 
-func (e *Entity) GetResourceName() ResourceName {
-  if e.ResourceName != `` { return e.ResourceName
-  } else { return ResourceName(`entities`) }
-}
+func (e *Entity) GetResourceName() ResourceName { return e.ResourceName }
 
 func (e *Entity) GetName() string { return e.Name }
 func (e *Entity) SetName(n string) { e.Name = n }
