@@ -40,7 +40,8 @@ func (e *Entity) ArchiveQueries(db orm.DB) []*orm.Query {
 }
 
 func (e *Entity) DeleteQueries(db orm.DB) []*orm.Query {
-  q := db.Model(e).
-    Where(`entity.id=?id`)
+  // so another undocumented aspect, go-pg appearently expects you to archive, then delete, because it won't delete something unless archived. Sort of like, "put in trash, take out trash."
+  q := db.Model(e).Where(`entity.id=?id`)
+  q.GetModel().Table().SoftDeleteField = nil
   return []*orm.Query{ q }
 }

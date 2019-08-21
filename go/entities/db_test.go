@@ -106,3 +106,14 @@ func (s *EntityIntegrationSuite) TestEntityArchive() {
   assert.NoError(s.T(), q.Select())
   assert.Equal(s.T(), e, archived)
 }
+
+func (s *EntityIntegrationSuite) TestEntityDelete() {
+  e := NewEntity(`entities`, `name`, `description`, ``, false)
+  require.NoError(s.T(), s.IM.CreateRaw(e))
+
+  var e1, e2 int
+  rdb.Connect().Query(&e1, "SELECT COUNT(*) FROM entities")
+  require.NoError(s.T(), s.IM.DeleteRaw(e))
+  rdb.Connect().Query(&e2, "SELECT COUNT(*) FROM entities")
+  assert.Equal(s.T(), e1 - 1, e2)
+}
