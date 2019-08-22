@@ -23,9 +23,9 @@ type Entity struct {
   Description      string       `json:"description"`
   OwnerID          EID          `json:"ownerPubId"`
   PubliclyReadable bool         `json:"publiclyReadable" pg:",notnull"`
-  CreatedAt        time.Time    `json:createdAt`
+  CreatedAt        time.Time    `json:"createdAt"`
   LastUpdated      time.Time    `json:"lastUpdated"`
-  DeletedAt        time.Time    `pg:",soft_delete"`
+  DeletedAt        time.Time    `json:"deletedAt" pg:",soft_delete"`
 }
 
 func NewEntity(

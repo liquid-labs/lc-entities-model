@@ -2,7 +2,6 @@ package entities
 
 import (
   "context"
-  "log"
   "fmt"
   "os"
   "reflect"
@@ -56,6 +55,15 @@ func (im *ItemManager) Begin() (*pg.Tx, error) {
   return im.tx, nil
 }
 
+func (im *ItemManager) BeginIfNecessary() (*pg.Tx, error) {
+  if im.tx != nil { return im.tx, nil }
+  
+  tx, err := im.db.Begin()
+  if err != nil { return tx, err  }
+  im.tx = tx
+  return im.tx, nil
+}
+
 func (im *ItemManager) dropTransaction() { im.tx = nil }
 
 func (im *ItemManager) Commit() error {
@@ -76,7 +84,6 @@ func (im *ItemManager) Rollback() error {
 
 func (im *ItemManager) doStateChangeOp(qs []*orm.Query, op *stateOp) error {
   if im.tx == nil && !im.AllowUnsafeStateChange {
-    log.Panicf("\n\ntx: %+v\n\n", im.tx)
     return fmt.Errorf(`Attempt to perform '%s' outside of transaction context.`, op.desc)
   } else {
     return RunStateQueries(qs, op)
