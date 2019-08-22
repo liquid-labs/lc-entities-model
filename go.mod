@@ -7,7 +7,3 @@ require (
 	github.com/go-pg/pg v8.0.5+incompatible
 	github.com/stretchr/testify v1.4.0
 )
-
-replace github.com/Liquid-Labs/lc-rdb-service => ../lc-rdb-service
-
-replace github.com/Liquid-Labs/terror => ../terror
