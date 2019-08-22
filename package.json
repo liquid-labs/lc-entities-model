@@ -1,6 +1,6 @@
 {
   "name": "@liquid-labs/lc-entities-model",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "description": "Defines Liquid Code foundational entity component models",
   "main": "dist/index.js",
   "scripts": {
